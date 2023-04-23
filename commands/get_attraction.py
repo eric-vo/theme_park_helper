@@ -1,25 +1,9 @@
-import os
-# import json
-
-from dotenv import load_dotenv
-import requests
 import discord
 from discord import app_commands
-from google_images_search import GoogleImagesSearch
 
-# Load the Google Custom Search API key and CX from the .env file
-load_dotenv()
-GCS_DEV_KEY = os.getenv('GCS_DEV_KEY')
-GCS_CX = os.getenv('GCS_CX')
-
-# Set up the Google Custom Search client
-gis = GoogleImagesSearch(GCS_DEV_KEY, GCS_CX)
-search_params = {
-    'num': 1,
-    'fileType': 'jpg|gif|png',
-    'rights': 'cc_publicdomain|cc_attribute|cc_sharealike|' +
-              'cc_noncommercial|cc_nonderived'
-}
+import utils.default_embed as default_embed
+from utils.park_data import get_park_data
+from utils.search_images import search_images
 
 
 async def check_and_message(
@@ -59,16 +43,8 @@ async def check_and_message(
             provided_ride['name'].lower() == desired_ride_name.lower()) or
             provided_ride['id'] == desired_ride_id):
         # Initialize the embed
-        embed = discord.Embed(
-            title=provided_ride['name'],
-            description="[Powered by Queue-Times.com]" +
-                        "(https://queue-times.com/en-US)",
-            color=discord.Color.og_blurple()
-        )
-        embed.set_thumbnail(
-            url=("https://is.gd/ZKNQZ9" if park.value == 16 else
-                 "https://is.gd/D6ajuW")
-        )
+        embed = default_embed.new_embed(provided_ride['name'])
+        default_embed.set_default_thumbnail(embed, park.value)
         embed.add_field(name="ID", value=provided_ride['id'], inline=False)
         embed.add_field(name="Park", value=park.name, inline=False)
 
@@ -86,12 +62,13 @@ async def check_and_message(
         else:
             embed.add_field(name="Status", value="Closed")
 
-        # Search for an image of the ride and add it to the embed
-        search_params['q'] = provided_ride['name'] + " disneyland california"
-        gis.search(search_params=search_params)
-        for image in gis.results():
-            embed.set_image(url=image.url)
-            break
+        try:
+            embed.set_image(
+                url=search_images(provided_ride['name'] +
+                                  " disneyland california")
+            )
+        except Exception:
+            embed.set_footer(text="Note: Daily image search limit reached.")
 
         # Send the embed
         await interaction.response.send_message(embed=embed)
@@ -119,23 +96,19 @@ async def get_attraction(
     """
 
     # Get the attractions' data from the Queue-Times API
-    print(f'https://queue-times.com/en-US/parks/{park.value}/queue_times.json')
-    response_json = requests.get(
-        f'https://queue-times.com/en-US/parks/{park.value}/queue_times.json'
-    ).json()
-    # print(json.dumps(response_json, sort_keys=True, indent=4))
+    park_data = get_park_data(park.value)
 
     # Check if the desired ride is in the list of rides that aren't in a land
-    for ride in response_json['rides']:
-        if await check_and_message(
-                interaction, park, ride, ride_name, ride_id):
+    for ride in park_data['rides']:
+        if await check_and_message(interaction, park,
+                                   ride, ride_name, ride_id):
             return
 
     # Check if the desired ride is in the list of rides that are in a land
-    for land in response_json['lands']:
+    for land in park_data['lands']:
         for ride in land['rides']:
-            if await check_and_message(
-                    interaction, park, ride, ride_name, ride_id, land['name']):
+            if await check_and_message(interaction, park,
+                                       ride, ride_name, ride_id, land['name']):
                 return
 
     # If the desired ride wasn't found, send an error message

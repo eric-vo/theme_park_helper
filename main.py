@@ -4,16 +4,11 @@ from dotenv import load_dotenv
 import discord
 from discord import app_commands
 
+import constants.constants as constants
+
 from commands.sync_commands import sync_commands
 from commands.get_attraction import get_attraction
-
-PARK_AND_ID_CHOICES = [
-    app_commands.Choice(name="Disneyland Park", value=16),
-    app_commands.Choice(name="Disney California Adventure", value=17)
-]
-
-# Refresh interval in minutes
-# TIME_INTERVAL = 5
+from commands.send_attractions import send_attractions
 
 # Load the Discord token from the .env file
 load_dotenv()
@@ -31,7 +26,7 @@ client = discord.Client(intents=intents)
 tree = app_commands.CommandTree(client)
 
 
-# Commands
+# Sync command
 # ----------
 @tree.command(guild=GUILD, description="Sync the commands to the guild.")
 async def sync(interaction: discord.Interaction):
@@ -39,6 +34,7 @@ async def sync(interaction: discord.Interaction):
 
 
 # get_attraction commands
+# ----------
 get_attraction_group = app_commands.Group(
     name="get_attraction", description="Get information about an attraction."
 )
@@ -47,7 +43,7 @@ get_attraction_group = app_commands.Group(
 # Decorator to add the park choices to the get_attraction commands
 def add_park_choices(func):
     func = app_commands.describe(park="The park the attraction is in.")(func)
-    func = app_commands.choices(park=PARK_AND_ID_CHOICES)(func)
+    func = app_commands.choices(park=constants.PARK_AND_ID_CHOICES)(func)
     return func
 
 
@@ -77,6 +73,19 @@ async def by_id(interaction: discord.Interaction,
 
 # Add the get_attraction commands to the command tree
 tree.add_command(get_attraction_group, guild=GUILD)
+
+
+# List attractions command
+# ----------
+@tree.command(guild=GUILD, description="List all attraction names with IDs.")
+@add_park_choices
+@app_commands.describe(
+    land="Optional: Filter by land or specify \"other\" " +
+         "to get attractions not in a land. "
+)
+async def list_attractions(interaction: discord.Interaction,
+                           park: app_commands.Choice[int], land: str = None):
+    await send_attractions(interaction, park, land)
 
 
 # Events
