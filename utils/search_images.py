@@ -18,7 +18,7 @@ search_params = {
 }
 
 
-def search_images(query: str):
+def search_images(query: str) -> str:
     """Searches for the first image of the query.
 
     Parameters

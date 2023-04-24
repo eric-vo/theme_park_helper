@@ -6,13 +6,10 @@ from utils.park_data import get_park_data
 from utils.search_images import search_images
 
 
-async def check_and_message(
-        interaction: discord.Interaction,
-        park: app_commands.Choice[int],
-        provided_ride: dict,
-        desired_ride_name: str,
-        desired_ride_id: int,
-        land=None):
+async def check_and_message(interaction: discord.Interaction,
+                            park: app_commands.Choice[int],
+                            provided_ride: dict, desired_ride_name: str,
+                            desired_ride_id: int, land=None):
     """Compares a provided ride to a desired ride name or ID
     and sends the ride's status message if they match.
     Only provide either name or iD.
@@ -56,9 +53,11 @@ async def check_and_message(
         # Otherwise, add that the ride is closed
         if provided_ride['is_open']:
             embed.add_field(name="Status", value="Open", inline=False)
-            embed.add_field(name="Wait Time",
-                            value=f"**{provided_ride['wait_time']}** minutes",
-                            inline=False)
+            embed.add_field(
+                name="Wait Time",
+                value=f"**{provided_ride['wait_time']}** minutes",
+                inline=False
+            )
         else:
             embed.add_field(name="Status", value="Closed")
 
@@ -75,11 +74,9 @@ async def check_and_message(
         return True
 
 
-async def get_attraction(
-        interaction: discord.Interaction,
-        park: app_commands.Choice[int],
-        ride_name: str = None,
-        ride_id: int = None):
+async def get_attraction(interaction: discord.Interaction,
+                         park: app_commands.Choice[int],
+                         ride_name: str = None, ride_id: int = None):
     """Looks for an attraction with the provided name or ID
     and sends its status message if it exists. Only provide either name or ID.
 
@@ -107,8 +104,8 @@ async def get_attraction(
     # Check if the desired ride is in the list of rides that are in a land
     for land in park_data['lands']:
         for ride in land['rides']:
-            if await check_and_message(interaction, park,
-                                       ride, ride_name, ride_id, land['name']):
+            if await check_and_message(interaction, park, ride,
+                                       ride_name, ride_id, land['name']):
                 return
 
     # If the desired ride wasn't found, send an error message

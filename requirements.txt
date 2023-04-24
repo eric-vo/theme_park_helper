@@ -1,3 +1,4 @@
+windows-curses
 python-dotenv
 discord.py
 Google-Images-Search

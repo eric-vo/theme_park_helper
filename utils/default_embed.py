@@ -3,10 +3,8 @@ import discord
 from constants.constants import DEFAULT_EMBED
 
 
-def new_embed(
-        title: str,
-        description: str = DEFAULT_EMBED['description'],
-        color=DEFAULT_EMBED['color']) -> discord.Embed:
+def new_embed(title: str, description: str = DEFAULT_EMBED['description'],
+              color=DEFAULT_EMBED['color']) -> discord.Embed:
     return discord.Embed(title=title, description=description, color=color)
 
 

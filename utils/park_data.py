@@ -1,7 +1,7 @@
 import requests
 
 
-def get_park_data(park_id: int):
+def get_park_data(park_id: int) -> dict:
     """Gets the data for the specified park from the Queue-Times API.
 
     Parameters

@@ -54,9 +54,7 @@ def add_park_choices(func):
 @add_park_choices
 async def by_name(interaction: discord.Interaction,
                   park: app_commands.Choice[int], attraction_name: str):
-    await get_attraction(
-        interaction, park, attraction_name
-    )
+    await get_attraction(interaction, park, attraction_name)
 
 
 # By ID
@@ -66,9 +64,7 @@ async def by_name(interaction: discord.Interaction,
 @add_park_choices
 async def by_id(interaction: discord.Interaction,
                 park: app_commands.Choice[int], attraction_id: int):
-    await get_attraction(
-        interaction, park, ride_id=attraction_id
-    )
+    await get_attraction(interaction, park, ride_id=attraction_id)
 
 
 # Add the get_attraction commands to the command tree
