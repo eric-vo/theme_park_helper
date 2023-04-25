@@ -1,14 +1,13 @@
 import os
 
-from dotenv import load_dotenv
 import discord
 from discord import app_commands
+from dotenv import load_dotenv
 
 import constants.constants as constants
-
-from commands.sync_commands import sync_commands
 from commands.get_attraction import get_attraction
 from commands.send_attractions import send_attractions
+from commands.sync_commands import sync_commands
 
 # Load the Discord token from the .env file
 load_dotenv()
