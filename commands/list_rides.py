@@ -18,9 +18,9 @@ def add_ride_status(embed: discord.Embed, ride: dict):
     )
 
 
-async def send_attractions(interaction: discord.Interaction,
-                           provided_park: app_commands.Choice[int],
-                           provided_land: str = None):
+async def list_rides(interaction: discord.Interaction,
+                     provided_park: app_commands.Choice[int],
+                     provided_land: str = None):
     await interaction.response.defer()
 
     park = get_park_data(provided_park.value)
@@ -59,7 +59,8 @@ async def send_attractions(interaction: discord.Interaction,
 
         embeds.append(embed)
 
-    if (not lands_to_display) or lands_to_display == park['lands']:
+    if ((not lands_to_display) or lands_to_display == park['lands'] and
+                park['rides']):
         embed = default_embed.new_embed("Other Attractions")
         default_embed.set_default_thumbnail(embed, provided_park.value)
 

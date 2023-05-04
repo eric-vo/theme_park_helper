@@ -74,9 +74,9 @@ async def check_and_message(interaction: discord.Interaction,
         return True
 
 
-async def get_attraction(interaction: discord.Interaction,
-                         park: app_commands.Choice[int],
-                         ride_name: str = None, ride_id: int = None):
+async def get_ride(interaction: discord.Interaction,
+                   park: app_commands.Choice[int],
+                   ride_name: str = None, ride_id: int = None):
     """Looks for an attraction with the provided name or ID
     and sends its status message if it exists. Only provide either name or ID.
 
