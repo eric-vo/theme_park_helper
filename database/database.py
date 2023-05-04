@@ -6,6 +6,16 @@ connection = sqlite3.connect("ride_tracker.db")
 cursor = connection.cursor()
 
 
+def create_table():
+    # Create a table that holds a user's ID and the attractions they are tracking
+    cursor.execute("""CREATE TABLE rides_tracked (user_id integer,
+                       park_id integer,
+                       ride_id integer,
+                       wait_threshold integer
+                   )""")
+    connection.commit()
+
+
 def insert_ride(user_id, park_id, ride_id, wait_threshold):
     # Check if an entry already exists
     # with the same user_id, park_id and ride_id
