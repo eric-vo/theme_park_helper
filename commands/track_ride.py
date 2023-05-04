@@ -53,7 +53,7 @@ async def track_ride(interaction: discord.Interaction,
         embed.add_field(
             name=park_data.ride_id_to_name(tracked_ride[1], tracked_ride[2]),
             value=f"**Park**: {park_name}\n" +
-                  f"**Wait Threshold**: {tracked_ride[3]} minutes",
+                  f"**Wait Threshold**: **{tracked_ride[3]}** minutes",
             inline=False
         )
     

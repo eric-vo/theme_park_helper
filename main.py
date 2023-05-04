@@ -1,5 +1,5 @@
+import asyncio
 import os
-# import sqlite3
 import time
 
 import discord
@@ -11,42 +11,7 @@ from commands.get_ride import get_ride
 from commands.list_rides import list_rides
 from commands.sync_commands import sync_commands
 from commands.track_ride import track_ride
-
-# Connect to ride tracking database
-# connection = sqlite3.connect("ride_tracker.db")
-
-# cursor = connection.cursor()
-
-# Create a table that holds a user's ID and the attractions they are tracking
-# cursor.execute("""CREATE TABLE users (
-#                    user_id integer,
-#                    park_id integer,
-#                    ride_id integer,
-#                    wait_threshold integer
-#                )""")
-
-# cursor.execute("INSERT INTO users VALUES (123, 456, 789)")
-
-# connection.commit()
-
-# cursor.execute("INSERT INTO users VALUES (?, ?, ?)",
-#   (user_id, park_id, ride_id))
-
-# connection.commit()
-
-# cursor.execute("INSERT INTO users VALUES (:user_id, :ride_id, :park_id)",
-#   {'user_id': user_id, 'ride_id': ride_id, 'park_id': park_id})
-
-# connection.commit()
-
-# cursor.execute("SELECT * FROM users WHERE user_id = 123")
-# cursor.execute("SELECT * FROM users WHERE user_id=?", (123,))
-
-# print(cursor.fetchall())
-
-# connection.commit()
-
-# connection.close()
+import database.database as db
 
 # Load the Discord token from the .env file
 load_dotenv()
@@ -67,7 +32,7 @@ tree = app_commands.CommandTree(client)
 async def track_rides():
     """Track rides and send messages to the message channel."""
     while True:
-        time.sleep(5 * 60)
+        await asyncio.sleep(5 * 60)
 
 
 # Sync command
@@ -166,7 +131,7 @@ tree.add_command(track_attraction_group, guild=GUILD)
 @client.event
 async def on_ready():
     print(f"Ready! logged in as {client.user}.")
-    # track_rides()
+    await track_rides()
 
 
 client.run(TOKEN)
