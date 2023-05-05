@@ -20,39 +20,25 @@ def get_park_data(park_id: int) -> dict:
 
 
 def ride_id_to_name(park_id: int, ride_id: int) -> str:
-    match = None
-    
     for land in get_park_data(park_id)['lands']:
         for ride in land['rides']:
             if ride['id'] == ride_id:
-                match = ride['name']
-                break
+                return ride['name']
     
-    if match is None:
-        for ride in get_park_data(park_id)['rides']:
-            if ride['id'] == ride_id:
-                match = ride['name']
-                break
-
-    return match
+    for ride in get_park_data(park_id)['rides']:
+        if ride['id'] == ride_id:
+            return ride['name']
 
 
 def ride_name_to_id(park_id: int, ride_name: str) -> int:
-    match = None
-    
     for land in get_park_data(park_id)['lands']:
         for ride in land['rides']:
-            if ride['name'] == ride_name:
-                match = ride['is']
-                break
+            if ride['name'].lower() == ride_name.lower():
+                return ride['id']
     
-    if match is None:
-        for ride in get_park_data(park_id)['rides']:
-            if ride['name'] == ride_name:
-                match = ride['is']
-                break
-
-    return match
+    for ride in get_park_data(park_id)['rides']:
+        if ride['name'].lower() == ride_name.lower():
+            return ride['id']
 
 
 def park_id_to_name(park_id: int) -> str:
@@ -60,8 +46,6 @@ def park_id_to_name(park_id: int) -> str:
         return "Disneyland Park"
     elif park_id == 17:
         return "Disney California Adventure"
-    
-    return None
 
 
 def park_name_to_id(park_name: str) -> int:
@@ -70,4 +54,24 @@ def park_name_to_id(park_name: str) -> int:
     elif park_name.lower() == "disney california adventure":
         return 17
     
-    return None
+
+def is_ride_open(park_id: int, ride_id: int) -> bool:
+    for land in get_park_data(park_id)['lands']:
+        for ride in land['rides']:
+            if ride['id'] == ride_id:
+                return ride['is_open']
+    
+    for ride in get_park_data(park_id)['rides']:
+        if ride['id'] == ride_id:
+            return ride['is_open']
+
+
+def get_ride_wait_time(park_id: int, ride_id: int) -> int:
+    for land in get_park_data(park_id)['lands']:
+        for ride in land['rides']:
+            if ride['id'] == ride_id:
+                return ride['wait_time']
+    
+    for ride in get_park_data(park_id)['rides']:
+        if ride['id'] == ride_id:
+            return ride['wait_time']

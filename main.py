@@ -1,10 +1,11 @@
 import asyncio
 import os
-import time
 
 import discord
 from discord import app_commands
 from dotenv import load_dotenv
+from commands.get_tracked_rides import get_tracked_rides
+from commands.untrack_ride import untrack_ride
 
 import constants.constants as constants
 from commands.get_ride import get_ride
@@ -120,10 +121,46 @@ async def by_id(interaction: discord.Interaction,
                 park: app_commands.Choice[int], attraction_id: int,
                 wait_threshold: int):
     await track_ride(interaction, park, wait_threshold, ride_id=attraction_id)
+    
+    
+# Add the get_attraction commands to the command tree
+tree.add_command(track_attraction_group, guild=GUILD)
+
+
+# untrack_attraction commands
+# ----------
+untrack_attraction_group = app_commands.Group(
+    name="untrack_attraction", description="Untrack an attraction."
+)
+
+
+@untrack_attraction_group.command(
+        description="Untrack an attraction by name.")
+@add_park_choices
+@app_commands.describe(attraction_name="The name of the attraction.")
+async def by_name(interaction: discord.Interaction,
+                          park: app_commands.Choice[int],
+                          attraction_name: str):
+    await untrack_ride(interaction, park, attraction_name)
+    
+    
+@untrack_attraction_group.command(
+        description="Untrack an attraction by ID.")
+@add_park_choices
+@app_commands.describe(attraction_id="The ID of the attraction.")
+async def by_id(interaction: discord.Interaction,
+                        park: app_commands.Choice[int],
+                        attraction_id: int):
+    await untrack_ride(interaction, park, ride_id=attraction_id)
 
 
 # Add the get_attraction commands to the command tree
-tree.add_command(track_attraction_group, guild=GUILD)
+tree.add_command(untrack_attraction_group, guild=GUILD)
+
+
+@tree.command(guild=GUILD, description="List all tracked attractions.")
+async def get_tracked_attractions(interaction: discord.Interaction):
+    await get_tracked_rides(interaction)
 
 
 # Events
@@ -136,10 +173,5 @@ async def on_ready():
 
 client.run(TOKEN)
 
-# TODO: Add command to add attractions with desired wait threshold
-# If the attraction is already being tracked, update its wait threshold
-# TODO: Add command to remove attractions
-# TODO: Add command to list attractions with wait thresholds and times
 # TODO: Add command to clear all attractions
-# TODO: Add command to toggle tracking of attractions
 # TODO: Ping if a ride gets shutdown or reopens

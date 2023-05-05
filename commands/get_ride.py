@@ -66,8 +66,9 @@ async def check_and_message(interaction: discord.Interaction,
                 url=search_images(provided_ride['name'] +
                                   " disneyland california")
             )
-        except Exception:
+        except Exception as e:
             embed.set_footer(text="Note: Daily image search limit reached.")
+            print(e)
 
         # Send the embed
         await interaction.response.send_message(embed=embed)

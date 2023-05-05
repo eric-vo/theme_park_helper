@@ -13,8 +13,6 @@ gis = GoogleImagesSearch(GCS_DEV_KEY, GCS_CX)
 search_params = {
     'num': 1,
     'fileType': 'jpg|gif|png',
-    'rights': 'cc_publicdomain|cc_attribute|cc_sharealike|' +
-              'cc_noncommercial|cc_nonderived'
 }
 
 
@@ -38,5 +36,4 @@ def search_images(query: str) -> str:
     gis.search(search_params=search_params)
 
     # Return the URL of the first result
-    for image in gis.results():
-        return image.url
+    return tuple(gis.results())[0].url

@@ -32,6 +32,18 @@ def insert_ride(user_id, park_id, ride_id, wait_threshold):
         cursor.execute("""INSERT INTO rides_tracked VALUES (?, ?, ?, ?)""",
                        (user_id, park_id, ride_id, wait_threshold))
     connection.commit()
+    
+    
+def delete_ride(user_id, park_id, ride_id):
+    cursor.execute("""DELETE FROM rides_tracked WHERE user_id = ? AND
+                   park_id = ? AND ride_id = ?""", (user_id, park_id, ride_id))
+    connection.commit()
+    
+
+def delete_all_rides(user_id):
+    cursor.execute("""DELETE FROM rides_tracked WHERE user_id = ?""",
+                   (user_id,))
+    connection.commit()
 
 
 def select_rides(user_id, park_id=None, ride_id=None):
@@ -47,10 +59,3 @@ def select_rides(user_id, park_id=None, ride_id=None):
                    tuple(data))
 
     return cursor.fetchall()
-
-# # Create a table that holds a user's ID and the attractions they are tracking
-# cursor.execute("""CREATE TABLE rides_tracked (user_id integer,
-#                    park_id integer,
-#                    ride_id integer,
-#                    wait_threshold integer
-#                )""")
