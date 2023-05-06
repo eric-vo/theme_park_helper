@@ -9,11 +9,11 @@ from utils.search_images import search_images
 def add_ride_status(embed: discord.Embed, ride: dict):
     embed.add_field(
         name=ride['name'],
-        value=(f"**ID**: {ride['id']}\n" +
+        value=((f"**Wait Time**: **{ride['wait_time']}** minutes\n"
+                if ride['is_open'] else "") +
                ("**Status**: " +
                 f"{'Open' if ride['is_open'] else 'Closed'}\n") +
-               (f"**Wait Time**: **{ride['wait_time']}** minutes"
-                if ride['is_open'] else "")),
+               f"**ID**: {ride['id']}\n"),
         inline=False
     )
 

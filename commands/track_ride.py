@@ -8,6 +8,8 @@ import utils.park_data as park_data
 from utils.search_images import search_images
 from utils.tracking_embed import add_tracked_rides
 
+
+# TODO: Speed this up
 async def track_ride(interaction: discord.Interaction,
                      park: app_commands.Choice[int], wait_threshold: int,
                      ride_name: str = None, ride_id: int = None):

@@ -1,5 +1,6 @@
 import asyncio
 import os
+import sqlite3
 
 import discord
 from discord import app_commands
@@ -13,6 +14,9 @@ from commands.list_rides import list_rides
 from commands.sync_commands import sync_commands
 from commands.track_ride import track_ride
 import database.database as db
+from utils.default_embed import new_embed, set_default_thumbnail
+import utils.park_data as park_data
+from utils.search_images import search_images
 
 # Load the Discord token from the .env file
 load_dotenv()
@@ -22,18 +26,82 @@ MESSAGE_CHANNEL_ID = os.getenv('MESSAGE_CHANNEL_ID')
 
 # The guild and channel to send messages to
 GUILD = discord.Object(int(GUILD_ID))
-MESSAGE_CHANNEL = discord.Object(int(MESSAGE_CHANNEL_ID))
 
 # Set up the Discord client and command tree
 intents = discord.Intents.default()
 client = discord.Client(intents=intents)
 tree = app_commands.CommandTree(client)
 
+TRACKING_INTERVAL = 2 * 60
+
 
 async def track_rides():
     """Track rides and send messages to the message channel."""
     while True:
-        await asyncio.sleep(5 * 60)
+        try:
+            tracked_rides = db.select_rides()
+        except sqlite3.OperationalError:
+            db.create_table()
+            continue
+
+        for ride in tracked_rides:
+            user_id, park_id, ride_id, wait_threshold, reached_threshold = ride
+            wait_time = park_data.get_ride_wait_time(park_id, ride_id)
+            
+            if wait_time is None:
+                continue
+            
+            print(wait_time, wait_threshold, reached_threshold)
+            
+            if wait_time <= wait_threshold and not reached_threshold:
+                ride_name = park_data.ride_id_to_name(park_id, ride_id)
+                embed = new_embed(
+                    "New update!",
+                    f"**{ride_name}** has now reached your wait threshold."
+                )
+                set_default_thumbnail(embed, park_id)
+                embed.set_image(
+                    url=search_images(f"{ride_name} disneyland california")
+                )
+                embed.add_field(
+                    name="Wait Threshold",
+                    value=f"**{wait_threshold}** minutes",
+                )
+                embed.add_field(
+                    name="Wait Time",
+                    value=f"**{wait_time}** minutes",
+                )
+
+                db.update_reached_threshold(user_id, park_id, ride_id, 1)
+                
+                channel = client.get_channel(int(MESSAGE_CHANNEL_ID))
+                await channel.send(content=f"<@{user_id}>", embed=embed)
+            elif wait_time > wait_threshold and reached_threshold:
+                ride_name = park_data.ride_id_to_name(park_id, ride_id)
+                embed = new_embed(
+                    "New update!",
+                    f"**{ride_name}** is now above your wait threshold."
+                )
+                set_default_thumbnail(embed, park_id)
+                embed.set_image(
+                    url=search_images(f"{ride_name} disneyland california")
+                )
+                embed.add_field(
+                    name="Wait Threshold",
+                    value=f"**{wait_threshold}** minutes",
+                )
+                embed.add_field(
+                    name="Wait Time",
+                    value=f"**{wait_time}** minutes",
+                )
+
+                db.update_reached_threshold(user_id, park_id, ride_id, 0)
+                
+                channel = client.get_channel(int(MESSAGE_CHANNEL_ID))
+                await channel.send(content=f"<@{user_id}>", embed=embed)
+            
+            
+        await asyncio.sleep(TRACKING_INTERVAL)
 
 
 # Sync command
