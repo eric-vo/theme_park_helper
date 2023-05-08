@@ -1,25 +1,20 @@
 import discord
 
-import utils.park_data as park_data
+from utils.park_data import get_ride
+from utils.park_data import park_id_to_name
 
-def add_tracked_rides(embed: discord.Embed, tracked_rides):
-    for tracked_ride in tracked_rides:
-        park_name = park_data.park_id_to_name(tracked_ride[1])
-        ride_is_open = park_data.is_ride_open(tracked_ride[1], tracked_ride[2])
+
+def add_tracked_rides(embed: discord.Embed, rides):
+    for ride in rides:
+        ride_data = get_ride(ride[1], ride[2])
 
         embed.add_field(
-            name=(
-                park_data.ride_id_to_name(tracked_ride[1], tracked_ride[2]) +
-                f" - {park_name}"
-            ),
-            value=f"**Wait Threshold**: **{tracked_ride[3]}** minutes\n" +
-                  ("**Wait Time**: **" +
-                   str(park_data.get_ride_wait_time(
-                       tracked_ride[1], tracked_ride[2]
-                   )) + "** minutes\n" if
-                   ride_is_open else "") +
+            name=f"{ride_data['name']} - {park_id_to_name(ride[1])}",
+            value=f"**Wait Threshold**: **{ride[3]}** minutes\n" +
+                  (f"**Wait Time**: **" + str(ride_data['wait_time']) + 
+                   "** minutes\n" if ride_data['is_open'] else "") +
                   "**Status**: " +
-                  ("Open\n" if ride_is_open else "Closed\n") +
-                  f"**ID**: {tracked_ride[2]}",
+                  ("Open\n" if ride_data['is_open'] else "Closed\n") +
+                  f"**ID**: {ride[2]}",
             inline=False
         )

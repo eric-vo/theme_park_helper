@@ -15,7 +15,6 @@ async def sync_commands(interaction: discord.Interaction,
     guild : discord.Object
         The guild to sync the commands to
     """
-    await interaction.response.send_message("Syncing commands...")
+    await interaction.response.defer()
     await tree.sync(guild=guild)
-    message = await interaction.original_response()
-    await message.edit(content="Synced commands!")
+    await interaction.followup.send(content="Synced commands!")

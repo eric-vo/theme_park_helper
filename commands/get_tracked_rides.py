@@ -20,7 +20,7 @@ async def get_tracked_rides(interaction: discord.Interaction):
     tracked_rides = db.select_rides(interaction.user.id)
     embed = new_embed(
         "Tracked Rides",
-        "Here are your current tracked rides:"
+        "Here are your currently tracked rides:"
     )
     
     add_tracked_rides(embed, tracked_rides)

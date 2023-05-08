@@ -24,16 +24,21 @@ async def track_ride(interaction: discord.Interaction,
     except sqlite3.OperationalError:
         db.create_table()
 
-    if ride_name is not None:
-        ride_id = park_data.ride_name_to_id(park.value, ride_name)
-        if ride_id is None:
-            return await interaction.followup.send(
-                f"Ride with name **{ride_name}** not found.")
-    else:
-        ride_name = park_data.ride_id_to_name(park.value, ride_id)
-        if ride_name is None:
+    if ride_name is None:
+        ride = park_data.get_ride(park.value, ride_id)
+        if ride is None:
             return await interaction.followup.send(
                 f"Ride with ID **{ride_id}** not found.")
+            
+        ride_name = ride['name']
+    else:
+        ride = park_data.get_ride(park.value, ride_name=ride_name)
+        
+        if ride is None:
+            return await interaction.followup.send(
+                f"Ride with name **{ride_name}** not found.")
+        
+        ride_id = ride['id']
         
     db.insert_ride(interaction.user.id, park.value,
                    ride_id, wait_threshold)
@@ -41,7 +46,7 @@ async def track_ride(interaction: discord.Interaction,
     tracked_rides = db.select_rides(interaction.user.id)
     embed = new_embed(
         f"Tracking {ride_name.title()}!",
-        "Here are your current tracked rides:"
+        "Here are your currently tracked rides:"
     )
     embed.set_image(
         url=search_images(f"{ride_name} disneyland california")
