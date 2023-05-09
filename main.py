@@ -52,7 +52,7 @@ async def track_rides():
 
         embed.add_field(
             name="ID",
-            value={ride_id},
+            value=ride_id,
             inline=False
         )
         embed.add_field(
