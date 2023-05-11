@@ -10,6 +10,5 @@ def new_embed(title: str, description: str = DEFAULT_EMBED['description'],
 
 def set_default_thumbnail(embed: discord.Embed, park_id: int):
     embed.set_thumbnail(
-        url=(DEFAULT_EMBED['disneyland_logo'] if park_id == 16 else
-             DEFAULT_EMBED['disney_ca_logo'])
+        url=(DEFAULT_EMBED[park_id])
     )

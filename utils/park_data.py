@@ -59,6 +59,8 @@ def park_id_to_name(park_id: int) -> str:
         return "Disneyland Park"
     elif park_id == 17:
         return "Disney California Adventure"
+    elif park_id == 66:
+        return "Universal Studios Hollywood"
 
 
 def park_name_to_id(park_name: str) -> int:
@@ -66,6 +68,8 @@ def park_name_to_id(park_name: str) -> int:
         return 16
     elif park_name.lower() == "disney california adventure":
         return 17
+    elif park_name.lower() == "universal studios hollywood":
+        return 66
     
 
 # def is_ride_open(park_id: int, ride_id: int) -> bool:
